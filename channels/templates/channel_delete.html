@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Channel: {{ channel.nickname }}</title>
+</head>
+<body>
+    <h1>Delete Channel: {{ channel.nickname }}</h1>
+    <p>Are you sure to delete this channel?</p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="channel" value="{{ channel.nickname }}">
+        <button type="submit">Yes</button>
+    </form>
+    <form action="{% url 'channel_list' %}" method="get">
+        <button type="submit">No</button>
+    </form>
+</body>
+</html>

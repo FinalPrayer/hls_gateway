@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Channel List</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Channel List</h1>
+    <div id="actions">
+        <a href="{% url 'channel_add' %}">Add a Channel</a>
+    </div>
+    {% if channels.count > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Channel Nickname</th>
+                    <th>Channel URL</th>
+                    <th>Delete?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel in channels %}
+                    <tr>
+                        <td>{{ channel.nickname }}</td>
+                        <td>{{ channel.url|truncatechars:50 }}</td>
+                        <td><a href="{% url 'channel_del' channel.nickname %}">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No Channels in database.</p>
+    {% endif %}
+</body>
+</html>
