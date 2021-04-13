@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import time
 
-from django.db.models import F
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -65,7 +64,7 @@ def channel_open(request, nickname):
         output_path = os.path.join(settings.BASE_DIR, 'channel_static', nickname)
         for file in os.listdir(output_path):
             os.remove(os.path.join(output_path, file))
-        ffmpeg_command = '/Users/zhongjiqidao/Developer/ffmpeg/bin/ffmpeg'
+        ffmpeg_command = os.getenv('FFMPEG_PATH', default='ffmpeg')
         f_null = open(os.devnull, 'w')
         command_parameters = [ffmpeg_command, '-y', '-fflags', 'nobuffer', '-rtsp_transport', 'tcp', '-i', input_path,
                               '-vsync', '0', '-copyts', '-c:v', 'copy', '-c:a', 'copy', '-hls_flags',

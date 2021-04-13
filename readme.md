@@ -22,6 +22,10 @@ FFMpeg is required as a dependency for this software. User firstly
 sets the input link and the nickname into the database. After the
 setup, user can watch the HLS stream using provided address.
 
+If FFMpeg is downloaded/compiled without adding into `PATH`, you can
+specify the path of FFMpeg by setting the environmental parameter
+`FFMPEG_PATH` to the corresponding executable location.
+
 ## Installation
 As this project is still under early development, deployment onto
 production is not yet supported. User can still install the software
@@ -136,8 +140,6 @@ developing, including the composing of this readme document.
 
 The following known bug fixes will be addressed in later development:
 
-- Currently, FFMpeg is only callable if it is included in `PATH`,
-  support of system environment specification will be implemented
 - If this software is running in a server with low-end performance,
   it may fail to return the playlist data when the channel is called
   before transcoding started.
