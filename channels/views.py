@@ -86,9 +86,16 @@ def channel_open(request, nickname):
 def channel_read(request, channel, filename):
     try:
         file_stream = open(os.path.join(settings.BASE_DIR, 'channel_static', channel, filename), 'rb')
+        extension = filename.split('.')[1]
+        if extension == 'm3u8':
+            response = HttpResponse(file_stream, content_type='application/vnd.apple.mpegurl')
+        elif extension == 'ts':
+            response = HttpResponse(file_stream, content_type='video/MP2T')
+        else:
+            response = HttpResponse(file_stream)
         channel_data = Channel.objects.get(nickname=channel)
         channel_data.hitting_count = channel_data.hitting_count + 1
         channel_data.save()
-        return HttpResponse(file_stream)
+        return response
     except FileNotFoundError:
         raise Http404("file does not exist")
