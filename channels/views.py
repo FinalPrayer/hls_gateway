@@ -66,7 +66,8 @@ def channel_open(request, nickname):
             os.remove(os.path.join(output_path, file))
         ffmpeg_command = os.getenv('FFMPEG_PATH', default='ffmpeg')
         f_null = open(os.devnull, 'w')
-        command_parameters = [ffmpeg_command, '-y', '-fflags', 'nobuffer', '-rtsp_transport', 'tcp', '-i', input_path,
+        command_parameters = [ffmpeg_command, '-hide_banner', '-loglevel', 'error',
+                              '-y', '-fflags', 'nobuffer', '-rtsp_transport', 'tcp', '-i', input_path,
                               '-vsync', '0', '-copyts', '-c:v', 'copy', '-c:a', 'copy', '-hls_flags',
                               'delete_segments+append_list', '-f', 'hls', '-segment_list_flags', nickname + '_live',
                               '-hls_time', '1', '-hls_list_size', '3', '-hls_segment_filename', output_path + '/%d.ts',
