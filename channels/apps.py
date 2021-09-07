@@ -5,7 +5,7 @@ from django import db
 from django.apps import AppConfig
 from django.conf import settings
 
-import helper
+from channels import helper
 
 
 class AutoStopService(Process):

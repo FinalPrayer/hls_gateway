@@ -9,7 +9,7 @@ from django.conf import settings
 
 from .forms import ChannelAddForm
 from .models import Channel
-from helper import init_channel_space
+from channels.helper import init_channel_space
 
 
 # Create your views here.
