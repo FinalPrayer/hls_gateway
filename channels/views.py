@@ -9,7 +9,7 @@ from django.conf import settings
 
 from .forms import ChannelAddForm
 from .models import Channel
-from channels.helper import init_channel_space
+from channels import helper
 
 
 # Create your views here.
@@ -56,7 +56,7 @@ def channel_open(request, nickname):
     if channel.transcode_pid < 1:
         input_path = channel.url
         ffmpeg_command = os.getenv('FFMPEG_PATH', default='ffmpeg')
-        output_path = init_channel_space(nickname)
+        output_path = helper.init_channel_space(nickname)
         f_null = open(os.devnull, 'w')
         command_parameters = [ffmpeg_command, '-hide_banner', '-loglevel', 'error',
                               '-y', '-fflags', 'nobuffer', '-rtsp_transport', 'tcp', '-i', input_path,
@@ -68,9 +68,8 @@ def channel_open(request, nickname):
         channel.transcode_pid = execution_process.pid
         channel.hitting_count = 1
         channel.save()
-        index_path = os.path.join(settings.BASE_DIR, 'channel_static', nickname, 'index.m3u8')
         for i in range(0, 10):
-            if not os.path.exists(index_path):
+            if not helper.channel_ready(nickname):
                 time.sleep(1)
     return redirect(reverse(channel_read, args=[nickname, 'index.m3u8']))
 

@@ -43,3 +43,15 @@ def init_channel_space(stream_nickname):
     for file in os.listdir(output_path):
         os.remove(os.path.join(output_path, file))
     return output_path
+
+
+def channel_ready(stream_nickname):
+    """
+    Detect whether the channel is ready to feed.
+    """
+    stream_path = os.path.join(settings.BASE_DIR, 'channel_static', stream_nickname)
+    fragment_count = 0
+    for file in os.listdir(stream_path):
+        if file.split('.')[-1] == "ts":
+            fragment_count += 1
+    return fragment_count > 2
