@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import time
 
@@ -10,6 +9,7 @@ from django.conf import settings
 
 from .forms import ChannelAddForm
 from .models import Channel
+from helper import init_channel_space
 
 
 # Create your views here.
@@ -22,9 +22,6 @@ def channel_add(request):
             channel.nickname = form.cleaned_data['nickname']
             channel.url = form.cleaned_data['url']
             channel.save()
-            new_channel_path = os.path.join(settings.BASE_DIR, 'channel_static', channel.nickname)
-            if not os.path.exists(new_channel_path):
-                os.makedirs(new_channel_path)
             return redirect(reverse(channel_list))
     context = {
         'form': form
@@ -35,10 +32,7 @@ def channel_add(request):
 def channel_del(request, channel):
     if request.method == 'POST':
         channel = Channel.objects.get(nickname=request.POST['channel'])
-        channel_path = os.path.join(settings.BASE_DIR, 'channel_static', channel.nickname)
         channel.delete()
-        if os.path.exists(channel_path):
-            shutil.rmtree(channel_path)
         return redirect(reverse(channel_list))
     else:
         context = {
@@ -61,10 +55,8 @@ def channel_open(request, nickname):
     # Status that channel is not yet started:
     if channel.transcode_pid < 1:
         input_path = channel.url
-        output_path = os.path.join(settings.BASE_DIR, 'channel_static', nickname)
-        for file in os.listdir(output_path):
-            os.remove(os.path.join(output_path, file))
         ffmpeg_command = os.getenv('FFMPEG_PATH', default='ffmpeg')
+        output_path = init_channel_space(nickname)
         f_null = open(os.devnull, 'w')
         command_parameters = [ffmpeg_command, '-hide_banner', '-loglevel', 'error',
                               '-y', '-fflags', 'nobuffer', '-rtsp_transport', 'tcp', '-i', input_path,
