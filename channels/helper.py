@@ -30,10 +30,10 @@ def purge_inactive_stream():
         if channel.transcode_pid == 0:
             channel_path = os.path.join(settings.BASE_DIR, 'channel_static', channel.nickname)
             if os.path.exists(channel_path):
-                for file in os.listdir(channel_path):
-                    if os.path.exists(os.path.join(channel_path, file)):
-                        os.remove(os.path.join(channel_path, file))
-                shutil.rmtree(channel_path)
+                try:
+                    shutil.rmtree(channel_path)
+                except FileNotFoundError:
+                    pass
 
 
 def init_channel_space(stream_nickname):
