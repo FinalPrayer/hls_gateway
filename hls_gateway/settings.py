@@ -121,3 +121,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# HLS related settings
+HLS_HEARTBEAT_CHECK_SECONDS = int(os.getenv('HLS_HEARTBEAT_CHECK_SECONDS', 10))
+HLS_STREAM_ROOT = os.getenv('HLS_STREAM_ROOT', BASE_DIR / 'channel_static')
+FFMPEG_PATH = os.getenv('FFMPEG_PATH', default='ffmpeg')

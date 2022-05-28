@@ -134,6 +134,30 @@ The procedure of using this software is:
 - Once added, open `/hls_gateway/watch/{nickname}` with players
   supporting HLS, where `nickname` is what you have set on last step.
 
+## Environmental Parameter Customization
+For this application, certain environmental parameters are disclosed
+for customization. These are:
+
+### `HLS_HEARTBEAT_CHECK_SECONDS`
+This parameter sets the period for each routine check of inactive
+stream, aims to terminate the stream if no one is watching.
+
+default: 10
+
+### `HLS_STREAM_ROOT`
+This parameter sets the root directory used to temporally storing all
+HLS stream fragments.
+
+default: `BASE_DIR / 'channel_static'`, means the folder of
+`channel_static` within the project directory.
+
+### `FFMPEG_PATH`
+In case if you are using a non-installed version of ffmpeg, it is
+possible to set the ffmpeg path using such environmental parameter.
+This is useful when using this app as embedded version or run in
+Docker environment.
+
+
 ## Development Roadmap
 This project is still under early development, and more features are
 developing, including the composing of this readme document.

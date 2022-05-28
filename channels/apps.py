@@ -1,11 +1,10 @@
 import time
 from multiprocessing import Process
 
-from django import db
 from django.apps import AppConfig
-from django.conf import settings
 
-from channels import helper
+from . import helper
+from . import settings as app_settings
 
 
 class AutoStopService(Process):
@@ -15,7 +14,7 @@ class AutoStopService(Process):
 
     def run(self):
         while True:
-            time.sleep(10)
+            time.sleep(app_settings.HLS_HEARTBEAT_CHECK_SECONDS)
             helper.stop_inactive_stream()
             helper.purge_inactive_stream()
 

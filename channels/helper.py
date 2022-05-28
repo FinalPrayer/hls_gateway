@@ -3,10 +3,11 @@ import signal
 import shutil
 
 from django.conf import settings
+from . import settings as app_settings
+from .models import Channel
 
 
 def stop_inactive_stream():
-    from .models import Channel
     for channel in Channel.objects.all():
         if channel.transcode_pid > 0:
             if channel.hitting_count == 0:
@@ -25,10 +26,9 @@ def stop_inactive_stream():
 
 
 def purge_inactive_stream():
-    from .models import Channel
     for channel in Channel.objects.all():
         if channel.transcode_pid == 0:
-            channel_path = os.path.join(settings.BASE_DIR, 'channel_static', channel.nickname)
+            channel_path = os.path.join(app_settings.HLS_STREAM_ROOT, channel.nickname)
             if os.path.exists(channel_path):
                 try:
                     shutil.rmtree(channel_path)
@@ -37,7 +37,7 @@ def purge_inactive_stream():
 
 
 def init_channel_space(stream_nickname):
-    output_path = os.path.join(settings.BASE_DIR, 'channel_static', stream_nickname)
+    output_path = os.path.join(app_settings.HLS_STREAM_ROOT, stream_nickname)
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     for file in os.listdir(output_path):
@@ -49,7 +49,7 @@ def channel_ready(stream_nickname):
     """
     Detect whether the channel is ready to feed.
     """
-    stream_path = os.path.join(settings.BASE_DIR, 'channel_static', stream_nickname)
+    stream_path = os.path.join(app_settings.HLS_STREAM_ROOT, stream_nickname)
     fragment_count = 0
     for file in os.listdir(stream_path):
         if file.split('.')[-1] == "ts":
