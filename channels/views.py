@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.conf import settings
 
+from . import settings as app_settings
 from .forms import ChannelAddForm
 from .models import Channel
 from channels import helper
@@ -62,7 +63,7 @@ def channel_open(request, nickname):
 
 def channel_read(request, channel, filename):
     try:
-        file_stream = open(os.path.join(settings.BASE_DIR, 'channel_static', channel, filename), 'rb')
+        file_stream = open(os.path.join(app_settings.HLS_STREAM_ROOT, channel, filename), 'rb')
         extension = filename.split('.')[1]
         if extension == 'm3u8':
             response = HttpResponse(file_stream, content_type='application/vnd.apple.mpegurl')
