@@ -80,9 +80,9 @@ def ffmpeg_command_builder(input_url, nickname, output_path):
 
     if urlparse(input_url).scheme == 'rtsp':
         # For RTSP, fall back the stream to use TCP instead of UDP for maximum compatibility
-        command.append(['-rtsp_transport', 'tcp'])
+        command.extend(['-rtsp_transport', 'tcp'])
 
-    command.append(['-i', input_url,
+    command.extend(['-i', input_url,
                     '-vsync', '0', '-copyts', '-c:v', 'copy', '-c:a', 'copy',
                     '-hls_flags', 'delete_segments+append_list', '-f', 'hls',
                     '-segment_list_flags', nickname + '_live',
