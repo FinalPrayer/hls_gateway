@@ -4,10 +4,10 @@ import shutil
 
 from django.conf import settings
 from . import settings as app_settings
-from .models import Channel
 
 
 def stop_inactive_stream():
+    from .models import Channel
     for channel in Channel.objects.all():
         if channel.transcode_pid > 0:
             if channel.hitting_count == 0:
@@ -26,6 +26,7 @@ def stop_inactive_stream():
 
 
 def purge_inactive_stream():
+    from .models import Channel
     for channel in Channel.objects.all():
         if channel.transcode_pid == 0:
             channel_path = os.path.join(app_settings.HLS_STREAM_ROOT, channel.nickname)
@@ -57,7 +58,7 @@ def channel_ready(stream_nickname):
     return fragment_count > 2
 
 
-def deploy_transcode_daemon(channel_object: Channel):
+def deploy_transcode_daemon(channel_object):
     import subprocess
     input_path = channel_object.url
     nickname = channel_object.nickname
