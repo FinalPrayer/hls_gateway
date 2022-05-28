@@ -1,5 +1,4 @@
 import os
-import subprocess
 import time
 
 from django.http import Http404, HttpResponse
@@ -54,20 +53,7 @@ def channel_open(request, nickname):
         raise Http404("Channel does not exist")
     # Status that channel is not yet started:
     if channel.transcode_pid < 1:
-        input_path = channel.url
-        ffmpeg_command = os.getenv('FFMPEG_PATH', default='ffmpeg')
-        output_path = helper.init_channel_space(nickname)
-        f_null = open(os.devnull, 'w')
-        command_parameters = [ffmpeg_command, '-hide_banner', '-loglevel', 'error',
-                              '-y', '-fflags', 'nobuffer', '-rtsp_transport', 'tcp', '-i', input_path,
-                              '-vsync', '0', '-copyts', '-c:v', 'copy', '-c:a', 'copy', '-hls_flags',
-                              'delete_segments+append_list', '-f', 'hls', '-segment_list_flags', nickname + '_live',
-                              '-hls_time', '1', '-hls_list_size', '3', '-hls_segment_filename', output_path + '/%d.ts',
-                              output_path + '/index.m3u8']
-        execution_process = subprocess.Popen(command_parameters, stdout=f_null)
-        channel.transcode_pid = execution_process.pid
-        channel.hitting_count = 1
-        channel.save()
+        helper.deploy_transcode_daemon(channel)
         for i in range(0, 10):
             if not helper.channel_ready(nickname):
                 time.sleep(1)

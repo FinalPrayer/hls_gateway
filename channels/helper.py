@@ -55,3 +55,37 @@ def channel_ready(stream_nickname):
         if file.split('.')[-1] == "ts":
             fragment_count += 1
     return fragment_count > 2
+
+
+def deploy_transcode_daemon(channel_object: Channel):
+    import subprocess
+    input_path = channel_object.url
+    nickname = channel_object.nickname
+    output_path = init_channel_space(nickname)
+    f_null = open(os.devnull, 'w')
+    execution_process = subprocess.Popen(ffmpeg_command_builder(input_path, nickname, output_path), stdout=f_null)
+    channel_object.transcode_pid = execution_process.pid
+    channel_object.hitting_count = 1
+    channel_object.save()
+
+
+def ffmpeg_command_builder(input_url, nickname, output_path):
+    from urllib.parse import urlparse
+    ffmpeg_command = app_settings.FFMPEG_PATH
+
+    # Base command building phase. This sets the FFMPEG running path, hide all banners, sets only report when error
+    # occurred, overrides output file without asking and reduces latency by omitting buffer
+    command = [ffmpeg_command, '-hide_banner', '-loglevel', 'error', '-y', '-fflags', 'nobuffer']
+
+    if urlparse(input_url).scheme == 'rtsp':
+        # For RTSP, fall back the stream to use TCP instead of UDP for maximum compatibility
+        command.append(['-rtsp_transport', 'tcp'])
+
+    command.append(['-i', input_url,
+                    '-vsync', '0', '-copyts', '-c:v', 'copy', '-c:a', 'copy',
+                    '-hls_flags', 'delete_segments+append_list', '-f', 'hls',
+                    '-segment_list_flags', nickname + '_live',
+                    '-hls_time', '1', '-hls_list_size', '3',
+                    '-hls_segment_filename', output_path + '/%d.ts',
+                    output_path + '/index.m3u8'])
+    return command
