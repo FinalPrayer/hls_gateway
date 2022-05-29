@@ -54,7 +54,10 @@ def channel_open(request, nickname):
         raise Http404("Channel does not exist")
     # Status that channel is not yet started:
     if channel.transcode_pid < 1:
-        helper.deploy_transcode_daemon(channel)
+        process_id = helper.deploy_transcode_daemon(channel)
+        channel.transcode_pid = process_id
+        channel.hitting_count = 1
+        channel.save()
         for i in range(0, 10):
             if not helper.channel_ready(nickname):
                 time.sleep(1)

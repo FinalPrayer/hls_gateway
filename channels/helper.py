@@ -2,8 +2,8 @@ import os
 import signal
 import shutil
 
-from django.conf import settings
 from . import settings as app_settings
+import logging
 
 
 def stop_inactive_stream():
@@ -12,7 +12,7 @@ def stop_inactive_stream():
         if channel.transcode_pid > 0:
             if channel.hitting_count == 0:
                 # Running, but no one watching in the past period anymore.
-                print("No one watching channel %s, stopping." % channel.nickname)
+                logging.info("No one watching channel %s, stopping." % channel.nickname)
                 process_to_kill = channel.transcode_pid
                 try:
                     os.kill(process_to_kill, signal.SIGTERM)
@@ -20,7 +20,7 @@ def stop_inactive_stream():
                     pass
                 channel.transcode_pid = 0
             else:
-                print('%s is still watching' % channel.nickname)
+                logging.info('%s is still watching' % channel.nickname)
                 channel.hitting_count = 0
             channel.save()
 
@@ -65,9 +65,8 @@ def deploy_transcode_daemon(channel_object):
     output_path = init_channel_space(nickname)
     f_null = open(os.devnull, 'w')
     execution_process = subprocess.Popen(ffmpeg_command_builder(input_path, nickname, output_path), stdout=f_null)
-    channel_object.transcode_pid = execution_process.pid
-    channel_object.hitting_count = 1
-    channel_object.save()
+    logging.info('Channel %s is transcoding under PID %d' % (channel_object.nickname, execution_process.pid))
+    return execution_process.pid
 
 
 def ffmpeg_command_builder(input_url, nickname, output_path):
